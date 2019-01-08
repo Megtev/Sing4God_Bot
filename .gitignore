@@ -1,5 +1,8 @@
 users/users_list.dat
 users/users_list.dir
+Logo/
+songs/PHM
+telegraph/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

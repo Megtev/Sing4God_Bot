@@ -1,12 +1,15 @@
 # Sing4God Bot 1.1.3 Early Access (17.12.2018)
 # Website: https://t.me/sing4god_bot
 
-
+import sys, os, time
+from log import logs
+logs.init_log_file('{0}\\Log\\{1}-{2}-{3}.{4}-{5}-{6}.log'.format(
+                            os.path.abspath(os.path.dirname(sys.argv[0])),
+                            *time.strftime('%D/%H/%M/%S').split('/')))
 from telepot.loop import MessageLoop
 from users import users
 from songs import songs
-import bot_control, sys, os
-import time, console
+import bot_control, console
 
 log_file = None
 def init_log_file(file_log_name):                   # Initialize log_file
@@ -15,6 +18,10 @@ def init_log_file(file_log_name):                   # Initialize log_file
     bot_control.log_file = log_file
 
 if __name__ == '__main__':
+	#def init_log_file(file_log_name):                   # Initialize log_file
+    #global log_file
+    #log_file = open(file_log_name, mode='w', encoding='utf-8')
+
 	print('Sing4God Bot 1.1.3 Early Access (17.12.2018)\nWebsite: https://t.me/sing4god_bot\n')
 
 	print('initializating...: database of users')
