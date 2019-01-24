@@ -84,7 +84,11 @@ def callback_handler(msg):			# callback quiry handler
 		logs.log_file.flush()
 
 def sendSongs(chat_id, songs, command, part=0):											# Send founded songs to a user of Telegram
+<<<<<<< HEAD
 	parse_md = ''
+=======
+	parse_md =''
+>>>>>>> 962ad9d770d67efe4fe8858a1efd9d4647a3c7f8
 	counter = 1
 	parts = math.ceil(len(songs) / 4)
 	songs_part = songs[0:4]
