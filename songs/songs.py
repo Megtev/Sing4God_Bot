@@ -15,16 +15,16 @@ def initdir(dirname):
 	global songs_list
 	songs_list = eval(_folderOfSongs.read().rstrip())					# Making list of songs from songs_list.txt
 
-	phm_pickle = open(os.path.abspath(os.path.dirname(sys.argv[0])) + r'\songs\phm.pickle', mode='rb')
+	#phm_pickle = open(os.path.abspath(os.path.dirname(sys.argv[0])) + r'\songs\phm.pickle', mode='rb')
 	
 	songsr_pkl = open(os.path.abspath(os.path.dirname(sys.argv[0])) + r'\songs\songs.pickle', mode='rb')
 	songs = pickle.load(songsr_pkl)
 	songsr_pkl.close()
 	songs_list.extend(songs)
 
-	phm_songs = pickle.load(phm_pickle)
-	songs_list.extend(phm_songs)
-	phm_pickle.close()
+	#phm_songs = pickle.load(phm_pickle)
+	#songs_list.extend(phm_songs)
+	#phm_pickle.close()
 
 	def sorter(elem): return elem['song_name'][0]
 	songs_list.sort(key=sorter)

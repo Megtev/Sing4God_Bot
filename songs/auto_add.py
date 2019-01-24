@@ -6,31 +6,21 @@ import string, pickle
 
 def _get_text(path, name):
 	l_text = convp.words_prs(Presentation(path + '\\' + name))
-	textw_pptx = open(path + '\\' + name + '.txt', mode='w', encoding='utf-8')
+	textw_pptx = open(path + '\\[s4G]Temp\\' + name + '.txt', mode='w', encoding='utf-8')
 	textw_pptx.write('names:\n' + name + '\n\n')
 	for x in l_text:
 		textw_pptx.write(x + '\n')
 	textw_pptx.close()
 
-	os.system('subl "' + path + '\\' + name + '.txt"')
-	mtime = os.path.getmtime(path + '\\' + name + '.txt')
+	os.system('subl "' + path + '\\[s4G]Temp\\' + name + '.txt"')
+	mtime = os.path.getmtime(path + '\\[s4G]Temp\\' + name + '.txt')
 	while True:
 		time.sleep(0.5)
-		if os.path.getmtime(path + '\\' + name + '.txt') != mtime:
+		if os.path.getmtime(path + '\\[s4G]Temp\\' + name + '.txt') != mtime:
 			break
+	os.remove('%s\\%s' % (path, name))
 
-	textr_pptx = open(path + '\\' + name + '.txt', mode='r', encoding='utf-8')
-	text_fp = textr_pptx.read()
-	textr_pptx.close()
-	return text_fp
-
-
-def get_list_song(path, name, from_file=True):
-	if from_file:
-		text_fp = _get_text(path, name)
-	else:
-		text_fp = path
-
+def get_list_song(text_fp):
 	text_fp = text_fp.split('\n\n')
 	for x in range(len(text_fp)):
 		text_fp[x] = text_fp[x].split('\n')
@@ -60,11 +50,6 @@ def get_list_song(path, name, from_file=True):
 	for x1 in range(len(text_fp)):
 		for x2 in range(len(text_fp[x1])):
 			text_fp[x1][x2] = text_fp[x1][x2].rstrip()
-
-	if from_file:
-		os.system('del "'+ path + '\\' + name + '.txt"')
-		print('added:', text_fp[0][0])
-
 	return text_fp
 
 def list_to_html(songs_list):
@@ -93,28 +78,48 @@ def add_telegraph(tele_acc, song_h, song_l):
 	responce = tele_acc.create_page(title=song_l[0][0], html_content=song_h, author_name=info['author_name'], author_url=info['author_url'])
 	return responce
 
-def add_new_songs(path, path_pkl, token='b9f7f14cbeaf0c7ee2710265b99c9baafae2cdf7baea2be8803020ba34e7', amount=1):
+def add_new_songs(path, amount=None):
+	if not amount: amount = len(os.listdir(path))
+	pptx_files = sorted(os.listdir(path))[:amount]
+	number = 1
+	if not os.path.exists(path + '\\[s4G]Temp'): os.mkdir(path + '\\[s4G]Temp')
+	for x in pptx_files:
+		if not os.path.isfile(path + '\\' + x) or (not x.endswith('.pptx') and not x.endswith('.PPTX')):
+			continue
+		song_l = _get_text(path, x)
+		print('[%s] added: %s' % (number, x))
+		number += 1
+
+def push(path, path_pkl, token='YOUR TOKEN'):
 	try:
-		pptx_files = os.listdir(path)[:amount]
 		tele_bot = Telegraph(token)
 		songsr_pkl = open(path_pkl + '\\songs.pickle', mode='rb')
 		songs = pickle.load(songsr_pkl)
 		songsr_pkl.close()
-		#songs = []
-		
-		for x in pptx_files:
-			song_l = get_list_song(path, x)
+		amount = 0
+		for file in os.listdir(path + '\\[s4G]Temp'):
+			song_file = open(path + '\\[s4G]Temp\\' + file, mode='r', encoding='utf-8')
+			song_l = get_list_song(song_file.read())
+			song_file.close()
 			song_h = list_to_html(song_l[1:])
 			responce = add_telegraph(tele_bot, song_h, song_l)
 			songs.append({ 'song_name' : [name for name in song_l[0]], 'url' : responce['url'], 'example' : '\n'.join(song_l[1]).strip()})
-			os.system('del "' + path + '\\' + x + '"')
+			os.remove(path + '\\[s4G]Temp\\' + file)
+			amount += 1
+	except ConnectionError:
+		print('###########')
+		print('#  ERROR  #')
+		print('###########')
+		print('\n\nCheck your internet connection or try later\n\n')
+
 	finally:
+		os.rmdir(path + '\\[s4G]Temp')
 		songsw_pkl = open(path_pkl + '\\songs.pickle', mode='wb')
 		pickle.dump(songs, songsw_pkl)
 		songsw_pkl.close()
-		print('done: added songs[%s]' % (amount))
+		print('done: pushed %s songs' % (amount))
 
-def add_new_song_t(song_text, path_pkl, token='b9f7f14cbeaf0c7ee2710265b99c9baafae2cdf7baea2be8803020ba34e7'):
+def add_new_song_t(song_text, path_pkl, token='YOUR TOKEN'):
 	try:
 		tele_bot = Telegraph(token)
 		songsr_pkl = open(path_pkl + '\\songs.pickle', mode='rb')
@@ -122,7 +127,7 @@ def add_new_song_t(song_text, path_pkl, token='b9f7f14cbeaf0c7ee2710265b99c9baaf
 		songsr_pkl.close()
 		#songs = []
 		
-		song_l = get_list_song(song_text, '', from_file=False)
+		song_l = get_list_song(song_text)
 		song_h = list_to_html(song_l[1:])
 		responce = add_telegraph(tele_bot, song_h, song_l)
 		songs.append({ 'song_name' : [name for name in song_l[0]], 'url' : responce['url'], 'example' : '\n'.join(song_l[1])})
@@ -130,8 +135,3 @@ def add_new_song_t(song_text, path_pkl, token='b9f7f14cbeaf0c7ee2710265b99c9baaf
 		songsw_pkl = open(path_pkl + '\\songs.pickle', mode='wb')
 		pickle.dump(songs, songsw_pkl)
 		songsw_pkl.close()
-
-
-#if __name__ == '__main__':
-#	songs_pkl = open(r'E:\Python\MyProject\Sing4God_Bot\songs\songs.pkl', mode='wb')
-#b9f7f14cbeaf0c7ee2710265b99c9baafae2cdf7baea2be8803020ba34e7
