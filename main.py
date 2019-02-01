@@ -1,4 +1,4 @@
-# Sing4God Bot 1.2 Early Access (24.01.2019)
+# Sing4God Bot 1.2.1 Early Access (01.02.2019)
 # Website: https://t.me/sing4god_bot
 
 import sys, os, time
@@ -19,7 +19,7 @@ def init_log_file(file_log_name):                   # Initialize log_file
 
 if __name__ == '__main__':
 
-	print('Sing4God Bot 1.2 Early Access (24.01.2019)\nWebsite: https://t.me/sing4god_bot\n')
+	print('Sing4God Bot 1.2.1 Early Access (01.02.2019)\nWebsite: https://t.me/sing4god_bot\n')
 
 	print('initializating...: database of users')
 	users.initdir(os.path.abspath(os.path.dirname(sys.argv[0])) + r'\users\users_list')
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 	songs.initdir(os.path.abspath(os.path.dirname(sys.argv[0])) + r'\songs')
 	print('done: database of songs\n')
 
-	bot_control.init_bot('YOUR BOT TOKEN')
+	bot_control.init_bot('788030920:AAH22J1w44kOI_y9ZM3RYmGaqGiGYu7Dga8')
 	MessageLoop(bot_control.bot, {'chat' : bot_control.chat_handler,
 									'callback_query' : bot_control.callback_handler}).run_as_thread()
 	while True:
